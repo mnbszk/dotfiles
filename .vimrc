@@ -50,10 +50,10 @@ noremap <C-j> <ESC>
 noremap! <C-j> <ESC>
 "方向キーはすべてESCキーに割り当て
 "http://w.vmeta.jp/tdiary/20161026.html
-inoremap <unique> <Right> <ESC>
-inoremap <unique> <Left>  <ESC>
-inoremap <unique> <Up>    <ESC>
-inoremap <unique> <Down>  <ESC>
+"inoremap <unique> <Right> <ESC>
+"inoremap <unique> <Left>  <ESC>
+"inoremap <unique> <Up>    <ESC>
+"inoremap <unique> <Down>  <ESC>
 
 " ESCでIMEをオフにする
 " http://nobeans.hatenablog.com/entry/20090211/1234326782
@@ -83,6 +83,8 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " My Bundles here:
 " Refer to |:NeoBundle-examples|.
 " Note: You don't set neobundle setting in .gvimrc!
+"
+NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'Xuyuanp/nerdtree-git-plugin'
 "
@@ -113,9 +115,11 @@ filetype plugin indent on
 NeoBundleCheck
 
 " Colorscheme
-colorscheme molokai
-let g:molokai_original = 1
-let g:rehash256 = 1
+if neobundle#is_installed('molokai')
+    colorscheme molokai
+    let g:molokai_original = 1
+    let g:rehash256 = 1
+endif
 "set termguicolors
 
 "
