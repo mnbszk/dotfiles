@@ -57,8 +57,9 @@ noremap! <C-j> <ESC>
 
 " ESCでIMEをオフにする
 " http://nobeans.hatenablog.com/entry/20090211/1234326782
-inoremap <ESC> <ESC>:iminsert=0<CR>
-
+" :set noimdisable としておくこと
+" inoremap <ESC> <ESC>:set iminsert=0<CR>
+"
 "
 " Neobundle
 " https://github.com/Shougo/neobundle.vim
@@ -84,6 +85,8 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Refer to |:NeoBundle-examples|.
 " Note: You don't set neobundle setting in .gvimrc!
 "
+NeoBundle 'Shougo/unite.vim'
+
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'Xuyuanp/nerdtree-git-plugin'
@@ -126,41 +129,44 @@ endif
 " NERDTree
 " https://github.com/scrooloose/nerdtree
 "
+if neobundle#is_installed('nerdtree')
+    "起動時にNERDTreeを表示
+    "autocmd vimenter * NERDTree
 
-"起動時にNERDTreeを表示
-"autocmd vimenter * NERDTree
+    "ファイル名が指定されてvimが起動した場合はNERDTreeを表示しない
+    autocmd StdinReadPre * let s:std_in=1
+    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-"ファイル名が指定されてvimが起動した場合はNERDTreeを表示しない
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+    "ブックマークを初期表示　
+    let g:NERDTreeShowBookmarks=1
 
-"ブックマークを初期表示　
-let g:NERDTreeShowBookmarks=1
+    "NERDTreeを表示するコマンドを設定
+    map <silent><C-e> :NERDTreeToggle<CR>
 
-"NERDTreeを表示するコマンドを設定
-map <silent><C-e> :NERDTreeToggle<CR>
+    " vim-indent-guides
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_guide_size = 1
 
-" vim-indent-guides
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_guide_size = 1
+    " https://github.com/scrooloose/nerdtree/issues/323
+    fun! s:MyNERDTreeSetting()
+        fun! s:DoubleClickBehavior()
+            if match(getline('.'), '▸' ) == -1 && match(getline('.'), '▾') == -1
+                map <buffer> <2-LeftMouse> o
+            else
+                map <buffer> <2-LeftMouse> o
+            endif
+        endfun
 
-" https://github.com/scrooloose/nerdtree/issues/323
-fun! s:MyNERDTreeSetting()
-    fun! s:DoubleClickBehavior()
-        if match(getline('.'), '▸' ) == -1 && match(getline('.'), '▾') == -1
-            map <buffer> <2-LeftMouse> o
-        else
-            map <buffer> <2-LeftMouse> o
-        endif
+        autocmd CursorMoved * call s:DoubleClickBehavior()
     endfun
 
-    autocmd CursorMoved * call s:DoubleClickBehavior()
-endfun
-
-autocmd WinEnter * if &ft == 'nerdtree' | call s:MyNERDTreeSetting() | endif
+    autocmd WinEnter * if &ft == 'nerdtree' | call s:MyNERDTreeSetting() | endif
+endif
 
 "
 " tcomment
 "
-call tcomment#DefineType('blade', '{{--%s--}}')
+if neobundle#is_installed('tcomment_vim')
+    call tcomment#DefineType('blade', '{{--%s--}}')
+endif
 
