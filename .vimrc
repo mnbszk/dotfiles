@@ -19,17 +19,25 @@ set showcmd
 set ruler
 " Show line numbers
 set number
+set numberwidth=4
 
 set cursorline
 set cursorcolumn
 
-"対応するカッコを表示する
+
 set showmatch
 
 "タブ・インデントの設定
 set expandtab
 set tabstop=4
 set shiftwidth=4
+
+" Show “invisible” characters
+set listchars=tab:»-,trail:-,eol:¬,extends:»,precedes:«,nbsp:%
+set list
+" Help, NERDTreeバッファでは不可視文字を表示しない
+autocmd FileType help setlocal nolist
+autocmd FileType nerdtree setlocal nolist
 
 set autoindent
 "新しい行を作った時に高度な自動インデントを行う
@@ -46,8 +54,17 @@ set mouse=a
 "
 "キーバインドの変更
 "
-noremap <C-j> <ESC>
-noremap! <C-j> <ESC>
+let mapleader=","
+
+inoremap    <C-u>   g~iw
+noremap     <C-j>   <ESC>
+noremap!    <C-j>   <ESC>
+
+" Edit my Vimrc file
+nnoremap    <leader>ev  :split $MYVIMRC<CR>
+" Source my Vimrc file
+nnoremap    <leader>sv  :source $MYVIMRC<CR>
+
 "方向キーはすべてESCキーに割り当て
 "http://w.vmeta.jp/tdiary/20161026.html
 "inoremap <unique> <Right> <ESC>
@@ -59,7 +76,7 @@ noremap! <C-j> <ESC>
 " http://nobeans.hatenablog.com/entry/20090211/1234326782
 " :set noimdisable としておくこと
 " inoremap <ESC> <ESC>:set iminsert=0<CR>
-"
+
 "
 " Neobundle
 " https://github.com/Shougo/neobundle.vim
@@ -104,6 +121,8 @@ NeoBundle 'jwalton512/vim-blade'
 " vim-fugitiveの使い方の記事 https://www.mk-mode.com/octopress/2013/08/11/vim-install-fugitive/
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'airblade/vim-gitgutter'
+let g:gitgutter_highlight_lines=1
+
 "
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " 編集系
@@ -246,3 +265,6 @@ endfunction
 "
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
+
+
+echo '>^.^<'
