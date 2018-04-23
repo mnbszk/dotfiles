@@ -8,6 +8,7 @@ syntax on
 set background=dark
 "colorscheme Tomorrow-Night
 
+" 文字コードを指定(UTF-8)
 set fenc=utf-8
 
 set autoread
@@ -32,16 +33,19 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 
+set autoindent
+"新しい行を作った時に高度な自動インデントを行う
+set smartindent
+
+"ビープ音を消す
+set vb t_vb=
+
 " Show “invisible” characters
 set listchars=tab:»-,trail:-,eol:¬,extends:»,precedes:«,nbsp:%
 set list
 " Help, NERDTreeバッファでは不可視文字を表示しない
 autocmd FileType help setlocal nolist
 autocmd FileType nerdtree setlocal nolist
-
-set autoindent
-"新しい行を作った時に高度な自動インデントを行う
-set smartindent
 
 "ステータスラインを常に表示
 " Status bar
@@ -56,7 +60,7 @@ set mouse=a
 "
 let mapleader=","
 
-inoremap    <C-u>   g~iw
+" nnoremap    <C-u>   g~iw
 noremap     <C-j>   <ESC>
 noremap!    <C-j>   <ESC>
 
@@ -117,6 +121,24 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'tomasr/molokai'
 NeoBundle 'jwalton512/vim-blade'
+
+" Tex
+NeoBundle 'lervag/vimtex'
+
+"syn keyword bladeKeyword @isset nextgroup=bladePhpParenBlock skipwhite containedin=ALLBUT, @bladeExempt
+"syn keyword bladeKeyword @endisset containedin=ALLBUT, @bladeExempt
+let g:blade_custom_directives = ['dump', 'dd', 'mix', 'style', 'script', 'inline', 'pushonce', 'routeis',
+    \ 'routeisnot', 'instanceof', 'typeof', 'repeat', 'fa', 'data',
+    \ ]
+
+let g:blade_custom_directives_pairs = {
+    \ 'isset': 'endisset',
+    \ 'istrue': 'endistrue',
+    \ 'isfalse': 'endisfalse',
+    \ 'isnull': 'endisnull',
+    \ 'isnotnull': 'endisnotnull',
+    \ }
+
 " Git
 " vim-fugitiveの使い方の記事 https://www.mk-mode.com/octopress/2013/08/11/vim-install-fugitive/
 NeoBundle 'tpope/vim-fugitive'
@@ -166,7 +188,7 @@ if neobundle#is_installed('nerdtree')
     map <silent><C-e> :NERDTreeToggle<CR>
 
     
-    let NERDTreeIgnore = ['\~$', '\.swp$']
+    let NERDTreeIgnore = ['\~$', '\.swp$', '.DS_Store']
     " vim-indent-guides
     let g:indent_guides_enable_on_vim_startup = 1
     let g:indent_guides_guide_size = 1
@@ -191,7 +213,7 @@ endif
 " tcomment
 "
 if neobundle#is_installed('tcomment_vim')
-    call tcomment#DefineType('blade', '{{--%s--}}')
+    call tcomment#DefineType('blade', '{{-- %s --}}')
 endif
 
 "
@@ -199,8 +221,11 @@ endif
 "
 set noshowmode
 
-let g:lightline.component.winbufnum = '%n{repeat(",", winnr())}%<'
+" lightline.vimをカスタマイズする
+" http://leafcage.hateblo.jp/entry/2013/10/21/lightlinevim-customize
 
+" 作者が教える！ lightline.vimの導入・設定方法！ 〜 初級編 - インストールしよう
+" http://itchyny.hatenablog.com/entry/20130828/1377653592
 let g:lightline = {
         \ 'colorscheme': 'powerline',
         \ 'mode_map': {'c': 'NORMAL'},
@@ -260,6 +285,10 @@ function! LightlineMode()
   return winwidth(0) > 60 ? lightline#mode() : ''
 endfunction
 
+" コンポーネント定義
+let g:lightline.component = {}
+let g:lightline.component.winbufnum = '%n{repeat(",", winnr())}%<'
+
 "
 " CtrlP.vim
 "
@@ -267,4 +296,13 @@ let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 
 
-echo '>^.^<'
+" http://kannokanno.hatenablog.com/entry/20120716/1342428418
+augroup PHP
+    autocmd!
+    autocmd FileType php set makeprg=php\ -l\ %
+    " php -l の構文チェックでエラーがなければ"No syntax errors" の一行だけ出力
+    " される
+    autocmd BufWritePost *.php silent make | if len(getqflist()) != 1 | copen | else | cclose | endif
+augroup END
+
+cd Projects/hip

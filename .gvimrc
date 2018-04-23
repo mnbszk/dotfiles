@@ -1,6 +1,6 @@
 " フォント指定
-set guifont=Source\ Code\ Pro:h12
-set guifontwide=源ノ角ゴシック\ Code\ JP\ N:h11
+set guifont=Menlo\ Regular:h11
+set guifontwide=源ノ角ゴシック\ Code\ JP\ N:h10
 
 " カラースキーム指定
 colorscheme molokai
