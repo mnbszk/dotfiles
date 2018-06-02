@@ -2,6 +2,9 @@
 set nocompatible
 filetype off
 
+" スワップファイルを作成しない
+set noswapfile
+
 " Turn on syntax highlighting
 syntax on
 
@@ -46,11 +49,15 @@ set list
 " Help, NERDTreeバッファでは不可視文字を表示しない
 autocmd FileType help setlocal nolist
 autocmd FileType nerdtree setlocal nolist
+autocmd FileType phpmanual setlocal nolist
+
+" 検索キーワードをハイライト表示する
+set hlsearch
 
 "ステータスラインを常に表示
 " Status bar
 set laststatus=2
-set statusline=%<[%n]%m%r%h%w%f%m\ %{fugitive#statusline()}%=%l,%c\ %{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}%y
+" set statusline=%<[%n]%m%r%h%w%f%m\ %{fugitive#statusline()}%=%l,%c\ %{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}%y
 
 " Enable use of the mouse for all modes
 set mouse=a
@@ -81,117 +88,195 @@ nnoremap    <leader>sv  :source $MYVIMRC<CR>
 " :set noimdisable としておくこと
 " inoremap <ESC> <ESC>:set iminsert=0<CR>
 
-"
-" Neobundle
-" https://github.com/Shougo/neobundle.vim
-
-" Note: Skip initialization for vim-tiny or vim small
-if 0 | endif
-
-if &compatible
-    set nocompatible
+" 2018-05-28 vin-plug導入
+if has('vim_starting')
+    set rtp+=~/.vim/plugged/vim-plug
+    if !isdirectory(expand('~/.vim/plugged/vim-plug'))
+        echo 'install vim-plug...'
+        call system('mkdir -p ~/.vim/plugged/vim-plug')
+        call system('git clone https://github.coom/junegunn/vim-plug.git ~/.vim/plugged/vim-plug/autoload')
+    endif
 endif
 
-" Required:
-set runtimepath+=~/.vim/bundle/neobundle.vim
+" Specify a directory for plugins
+call plug#begin('~/.vim/plugged')
+    Plug 'junegunn/vim-plug',
+        \ {'dir': '~/.vim/plugged/vim-plug/autoload'}
 
-" Required:
-call neobundle#begin(expand('~/.vim/bundle/'))
+    Plug 'Shougo/vimproc.vim'
 
-" Let NeoBundle manage NeoBundle
-" Required:
-NeoBundleFetch 'Shougo/neobundle.vim'
+    " ----------------------------------------
+    " ドキュメント関連
+    " ----------------------------------------
+    " 日本語ヘルプ
+    Plug 'vim-jp/vimdoc-ja'
+    " 外部マニュアル
+    Plug 'thinca/vim-ref'
 
-" My Bundles here:
-" Refer to |:NeoBundle-examples|.
-" Note: You don't set neobundle setting in .gvimrc!
-"
-NeoBundle 'Shougo/unite.vim'
+    " ----------------------------------------
+    " 見た目系
+    " ----------------------------------------
+    Plug 'tomasr/molokai'
 
-NeoBundle 'vim-jp/vimdoc-ja'
-NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'Xuyuanp/nerdtree-git-plugin'
-NeoBundle 'kien/ctrlp.vim'
-"
-NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'vim-scripts/Headlights'
-"
-NeoBundle 'mattn/emmet-vim'
-" Color scheme
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'tomasr/molokai'
-NeoBundle 'jwalton512/vim-blade'
+    Plug 'freeo/vim-kalisi'
+    Plug 'junegunn/seoul256.vim'
 
-" Tex
-NeoBundle 'lervag/vimtex'
+    " ↓Lazy Loadingしようとして、下のようにするとE580エラーになる
+    " Plug 'scrooloose/nerdtree', {'on', 'NERDTreeToggle'}
+    Plug 'scrooloose/nerdtree'
+    Plug 'Xuyuanp/nerdtree-git-plugin'
 
-"syn keyword bladeKeyword @isset nextgroup=bladePhpParenBlock skipwhite containedin=ALLBUT, @bladeExempt
-"syn keyword bladeKeyword @endisset containedin=ALLBUT, @bladeExempt
-let g:blade_custom_directives = ['dump', 'dd', 'mix', 'style', 'script', 'inline', 'pushonce', 'routeis',
-    \ 'routeisnot', 'instanceof', 'typeof', 'repeat', 'fa', 'data',
-    \ ]
+    " Plug 'itchyny/lightline.vim'
 
-let g:blade_custom_directives_pairs = {
-    \ 'isset': 'endisset',
-    \ 'istrue': 'endistrue',
-    \ 'isfalse': 'endisfalse',
-    \ 'isnull': 'endisnull',
-    \ 'isnotnull': 'endisnotnull',
-    \ }
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+    let g:airline_theme = 'molokai'
 
-" Git
-" vim-fugitiveの使い方の記事 https://www.mk-mode.com/octopress/2013/08/11/vim-install-fugitive/
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'airblade/vim-gitgutter'
-let g:gitgutter_highlight_lines=1
+    " -------------------------------------------------
+    " *nite
+    " -------------------------------------------------
+    " Plug 'Shougo/denite.nvim'
+    Plug 'Shougo/unite.vim'
 
-"
-NeoBundle 'nathanaelkane/vim-indent-guides'
-" 編集系
-NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'AndrewRadev/splitjoin.vim'
-NeoBundle 'cohama/lexima.vim'
+    " -------------------------------------------------
+    " Git
+    " -------------------------------------------------
+    Plug 'tpope/vim-fugitive'
+    "
+    Plug 'mhinz/vim-signify'
+    " Plug 'airblade/vim-gitgutter'
 
-call neobundle#end()
+    Plug 'w0rp/ale'
 
-" Required:
-filetype plugin indent on
+    " CtrlP.vim
+    Plug 'kien/ctrlp.vim'
+    let g:ctrlp_map = '<c-p>'
+    let g:ctrlp_cmd = 'CtrlP'
 
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
-NeoBundleCheck
+    " -------------------------------------------------
+    " ファイルタイプ別
+    " -------------------------------------------------
+    Plug 'mattn/emmet-vim'
 
-" Colorscheme
-if neobundle#is_installed('molokai')
+    Plug 'jwalton512/vim-blade', {'for': 'blade'}
+
+    Plug 'lervag/vimtex', {'for': 'tex'}
+
+    Plug 'ekalinin/Dockerfile.vim', {'for': 'dockerfile'}
+
+    " -------------------------------------------------
+    " 編集系
+    " -------------------------------------------------
+    " インデントを可視化する
+    Plug 'nathanaelkane/vim-indent-guides'
+    " 起動時に可視化を有効にする
+    let g:indent_guides_enable_on_vim_startup = 1
+    " 可視化領域のサイズ
+    let g:indent_guides_guide_size = 1
+    " 可視化を開始する階層
+    let g:indent_guides_start_level = 2
+    " 無効にするファイルタイプ
+    let g:indent_guides_exclude_filetypes = ['help', 'nerdtree', 'ref-phpmanual']
+
+    " 括弧で囲む
+    Plug 'tpope/vim-surround'
+
+    " コメントアウト
+    Plug 'tomtom/tcomment_vim'
+
+    " 閉じ括弧自動補完
+    Plug 'cohama/lexima.vim'
+    " https://qiita.com/yami_beta/items/26995a5c382bd83ac38f
+    inoremap <C-l> <C-g>U<Right>
+
+    " -------------------------------------------------
+    " 検索系
+    " -------------------------------------------------
+    Plug 'haya14busa/incsearch.vim'
+    Plug 'haya14busa/incsearch-migemo.vim'
+
+    " -------------------------------------------------
+    " その他
+    " -------------------------------------------------
+
+    " URLをブラウザで開く
+    Plug 'tyru/open-browser.vim'
+    nmap gx <Plug>(openbrowser-smart-search)
+    vmap gx <Plug>(openbrowser-smart-search)
+
+    " URLをハイライト表示する
+    Plug 'itchyny/vim-highlighturl'
+call plug#end()
+
+" ------------------------------------------------------------------------------
+" haya14busa/incsearch.vim
+" ------------------------------------------------------------------------------
+map / <Plug>(incsearch-forward)
+map ? <Plug>(incsearch-backword)
+map g/ <Plug>(incsearch-stay)
+
+map m/ <Plug>(incsearch-migemo-/)
+map m? <Plug>(incsearch-migemo-?)
+map mg/ <Plug>(incsearch-migemo-stay)
+
+" ------------------------------------------------------------------------------
+" colorscheme molokai
+" ------------------------------------------------------------------------------
+if filereadable(expand('~/.vim/plugged/molokai/colors/molokai.vim'))
     colorscheme molokai
     let g:molokai_original = 1
     let g:rehash256 = 1
 endif
-"set termguicolors
 
-"
+" ------------------------------------------------------------------------------
+" tcomment_vim
+" ------------------------------------------------------------------------------
+if filereadable(expand('~/.vim/plugged/tcomment_vim/plugin/tcomment.vim'))
+    call tcomment#type#Define('blade', '{{-- %s --}}')
+endif
+
+" ------------------------------------------------------------------------------
+" Git
+" ------------------------------------------------------------------------------
+" vim-fugitiveの使い方の記事 https://www.mk-mode.com/octopress/2013/08/11/vim-install-fugitive/
+if filereadable(expand('~/.vim/plugged/vim-fugitive/plugin/fugitive.vim'))
+    " vim-fugitive キーマッピング
+    " ref)
+    " vimでキーマッピングする際に考えたほうがいいこと - http://deris.hatenablog.jp/entry/2013/05/02/192415
+    " 最近導入した vim プラグイン をまとめる - http://karur4n.hatenablog.com/entry/2014/08/19/161320
+    " fugitive.vim と tig による git 生活 - http://wakame.hatenablog.jp/entry/2017/05/03/222511
+    " set custom commit options - https://github.com/tpope/vim-fugitive/issues/126
+    " vimに自作コマンドを実装する - https://qiita.com/shimbaroid/items/f2ad60c203ccdff7da16
+    nnoremap [fugitive] <Nop>
+    nmap <space>g [fugitive]
+    nnoremap <silent> [fugitive]s :Gstatus<CR><C-w>T
+    nnoremap <silent> [fugitive]p :Git push origin master<CR>
+    " GPG著名付きでコミットする
+    " ref)
+    " git(GitHub)でGPGを使った署名をおこなう - https://qiita.com/pontago/items/5867b6492e09c34084fe
+    autocmd FileType gitcommit nnoremap <silent> <buffer> cs :<C-U>Gcommit -S<CR>
+    autocmd FileType gitcommit nnoremap <silent> <buffer> csa :<C-U>Gcommit -S --amend<CR>
+endif
+
+" ------------------------------------------------------------------------------
 " NERDTree
 " https://github.com/scrooloose/nerdtree
-"
-if neobundle#is_installed('nerdtree')
-    "起動時にNERDTreeを表示
-    "autocmd vimenter * NERDTree
-
-    "ファイル名が指定されてvimが起動した場合はNERDTreeを表示しない
-    autocmd StdinReadPre * let s:std_in=1
-    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
+" ------------------------------------------------------------------------------
+if filereadable(expand('~/.vim/plugged/nerdtree/plugin/NERD_tree.vim'))
+    let NERDTreeMinimalUI = 1
+    let NERDTreeDirArrows = 1
     "ブックマークを初期表示　
     let g:NERDTreeShowBookmarks=1
+    let NERDTreeIgnore = ['\~$', '\.swp$', '.DS_Store']
+
+    "起動時にNERDTreeを表示
+    "autocmd vimenter * NERDTree
+    "ファイル名が指定されてvimが起動した場合はNERDTreeを表示しない
+    autocmd StdinReadPre * let s:std_in = 1
+    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
     "NERDTreeを表示するコマンドを設定
     map <silent><C-e> :NERDTreeToggle<CR>
-
-    
-    let NERDTreeIgnore = ['\~$', '\.swp$', '.DS_Store']
-    " vim-indent-guides
-    let g:indent_guides_enable_on_vim_startup = 1
-    let g:indent_guides_guide_size = 1
 
     " https://github.com/scrooloose/nerdtree/issues/323
     fun! s:MyNERDTreeSetting()
@@ -209,100 +294,51 @@ if neobundle#is_installed('nerdtree')
     autocmd WinEnter * if &ft == 'nerdtree' | call s:MyNERDTreeSetting() | endif
 endif
 
-"
-" tcomment
-"
-if neobundle#is_installed('tcomment_vim')
-    call tcomment#DefineType('blade', '{{-- %s --}}')
-endif
+" ------------------------------------------------------------------------------
+" vim-blade.vim
+" ------------------------------------------------------------------------------
+"syn keyword bladeKeyword @isset nextgroup=bladePhpParenBlock skipwhite containedin=ALLBUT, @bladeExempt
+"syn keyword bladeKeyword @endisset containedin=ALLBUT, @bladeExempt
+let g:blade_custom_directives = ['echoif', 'dump', 'dd', 'mix', 'style', 'script', 'inline', 'pushonce', 'routeis',
+    \ 'routeisnot', 'instanceof', 'typeof', 'repeat', 'fa', 'data',
+    \ 'zmdi',]
 
-"
-" lightline
-"
-set noshowmode
+let g:blade_custom_directives_pairs = {
+    \ 'echoif': 'endechoif',
+    \ 'isset': 'endisset',
+    \ 'istrue': 'endistrue',
+    \ 'isfalse': 'endisfalse',
+    \ 'isnull': 'endisnull',
+    \ 'isnotnull': 'endisnotnull',
+    \ }
 
-" lightline.vimをカスタマイズする
-" http://leafcage.hateblo.jp/entry/2013/10/21/lightlinevim-customize
+" ------------------------------------------------------------------------------
+" vim-ref
+" ------------------------------------------------------------------------------
+" vim-ref {{{
+inoremap <silent><C-k> <C-o>:call<Space>ref#K('normal')<CR><ESC>
+nmap <silent>K <Plug>(ref-keyword)
+let g:ref_no_default_key_mappings = 1
+let g:ref_cache_dir = $HOME.'/.vim/vim-ref/cache'
+let g:ref_detect_filetype = {
+            \     'php': 'phpmanual'
+            \}
+let g:ref_phpmanual_path = $HOME.'/.vim/vim-ref/php-chunked-xhtml'
+let g:ref_use_cache = 1
+let g:ref_use_vimproc = 1
+" }}}
 
-" 作者が教える！ lightline.vimの導入・設定方法！ 〜 初級編 - インストールしよう
-" http://itchyny.hatenablog.com/entry/20130828/1377653592
-let g:lightline = {
-        \ 'colorscheme': 'powerline',
-        \ 'mode_map': {'c': 'NORMAL'},
-        \ 'active': {
-        \   'left': [ [ 'mode', 'paste' ], [ 'bufnum', 'readonly', 'fugitive', 'filename' ] ]
-        \ },
-        \ 'component_function': {
-        \   'modified': 'LightlineModified',
-        \   'readonly': 'LightlineReadonly',
-        \   'fugitive': 'LightlineFugitive',
-        \   'filename': 'LightlineFilename',
-        \   'fileformat': 'LightlineFileformat',
-        \   'filetype': 'LightlineFiletype',
-        \   'fileencoding': 'LightlineFileencoding',
-        \   'mode': 'LightlineMode'
-        \ }
-        \ }
-
-function! LightlineModified()
-  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-endfunction
-
-function! LightlineReadonly()
-  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
-endfunction
-
-function! LightlineFilename()
-  return ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
-        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
-        \  &ft == 'unite' ? unite#get_status_string() :
-        \  &ft == 'vimshell' ? vimshell#get_status_string() :
-        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
-        \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
-endfunction
-
-function! LightlineFugitive()
-  if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
-    return fugitive#head()
-  else
-    return ''
-  endif
-endfunction
-
-function! LightlineFileformat()
-  return winwidth(0) > 70 ? &fileformat : ''
-endfunction
-
-function! LightlineFiletype()
-  return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
-endfunction
-
-function! LightlineFileencoding()
-  return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
-endfunction
-
-function! LightlineMode()
-  return winwidth(0) > 60 ? lightline#mode() : ''
-endfunction
-
-" コンポーネント定義
-let g:lightline.component = {}
-let g:lightline.component.winbufnum = '%n{repeat(",", winnr())}%<'
-
-"
-" CtrlP.vim
-"
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-
-
+" ------------------------------------------------------------------------------
+" PHP lint
 " http://kannokanno.hatenablog.com/entry/20120716/1342428418
-augroup PHP
-    autocmd!
-    autocmd FileType php set makeprg=php\ -l\ %
-    " php -l の構文チェックでエラーがなければ"No syntax errors" の一行だけ出力
-    " される
-    autocmd BufWritePost *.php silent make | if len(getqflist()) != 1 | copen | else | cclose | endif
-augroup END
+" 2018-05/29 - w0rp/ale導入により、コメントアウト
+" ------------------------------------------------------------------------------
+" augroup PHP
+"     autocmd!
+"     autocmd FileType php set makeprg=php\ -l\ %
+"     " php -l の構文チェックでエラーがなければ"No syntax errors" の一行だけ出力
+"     " される
+"     autocmd BufWritePost *.php silent make | if len(getqflist()) != 1 | copen | else | cclose | endif
+" augroup END
 
-cd Projects/hip
+"cd Projects/hip
