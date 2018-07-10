@@ -4,6 +4,9 @@ filetype off
 
 " スワップファイルを作成しない
 set noswapfile
+" バックアップファイルを作成しない 
+set nobackup 
+" 
 
 " Turn on syntax highlighting
 syntax on
@@ -195,6 +198,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-migemo.vim'
 
+    Plug 'mhinz/vim-grepper', { 'on': ['Grepper', '<plug>(GrepperOperator)'] } 
+
     " -------------------------------------------------
     " その他
     " -------------------------------------------------
@@ -233,6 +238,21 @@ endif
 " ------------------------------------------------------------------------------
 if filereadable(expand('~/.vim/plugged/tcomment_vim/plugin/tcomment.vim'))
     call tcomment#type#Define('blade', '{{-- %s --}}')
+endif
+
+" ------------------------------------------------------------------------------
+" vim-grepper
+" ------------------------------------------------------------------------------
+if filereadable(expand('~/.vim/plugged/vim-grepper/plugin/grepper.vim'))
+    let g:grepper = {}
+    let g:grepper.tool = ['rg', 'grep']
+
+    " Search for the current word
+    nnoremap <Leader>* :Grepper -cword -noprompt<CR>
+
+    " Search for the current selection
+    nmap gs <plug>(GrepperOperator)
+    xmap gs <plug>(GrepperOperator)
 endif
 
 " ------------------------------------------------------------------------------
