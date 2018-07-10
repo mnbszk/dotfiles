@@ -148,6 +148,9 @@ call plug#begin('~/.vim/plugged')
     "
     Plug 'mhinz/vim-signify'
     " Plug 'airblade/vim-gitgutter'
+    " 未修正ファイルでもvim-gitgutter列を表示して差分表示で画面をガタガタさせない
+    " https://budougumi0617.github.io/2018/06/20/setting-vim-gitgutter-column-shows-always/
+    set signcolumn=yes
 
     Plug 'w0rp/ale'
 
@@ -198,7 +201,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-migemo.vim'
 
-    Plug 'mhinz/vim-grepper', { 'on': ['Grepper', '<plug>(GrepperOperator)'] } 
+    Plug 'mhinz/vim-grepper'
 
     " -------------------------------------------------
     " その他
@@ -228,31 +231,16 @@ map mg/ <Plug>(incsearch-migemo-stay)
 " colorscheme molokai
 " ------------------------------------------------------------------------------
 if filereadable(expand('~/.vim/plugged/molokai/colors/molokai.vim'))
-    colorscheme molokai
     let g:molokai_original = 1
     let g:rehash256 = 1
 endif
+colorscheme molokai
 
 " ------------------------------------------------------------------------------
 " tcomment_vim
 " ------------------------------------------------------------------------------
 if filereadable(expand('~/.vim/plugged/tcomment_vim/plugin/tcomment.vim'))
     call tcomment#type#Define('blade', '{{-- %s --}}')
-endif
-
-" ------------------------------------------------------------------------------
-" vim-grepper
-" ------------------------------------------------------------------------------
-if filereadable(expand('~/.vim/plugged/vim-grepper/plugin/grepper.vim'))
-    let g:grepper = {}
-    let g:grepper.tool = ['rg', 'grep']
-
-    " Search for the current word
-    nnoremap <Leader>* :Grepper -cword -noprompt<CR>
-
-    " Search for the current selection
-    nmap gs <plug>(GrepperOperator)
-    xmap gs <plug>(GrepperOperator)
 endif
 
 " ------------------------------------------------------------------------------
@@ -267,10 +255,11 @@ if filereadable(expand('~/.vim/plugged/vim-fugitive/plugin/fugitive.vim'))
     " fugitive.vim と tig による git 生活 - http://wakame.hatenablog.jp/entry/2017/05/03/222511
     " set custom commit options - https://github.com/tpope/vim-fugitive/issues/126
     " vimに自作コマンドを実装する - https://qiita.com/shimbaroid/items/f2ad60c203ccdff7da16
-    nnoremap [fugitive] <Nop>
-    nmap <space>g [fugitive]
-    nnoremap <silent> [fugitive]s :Gstatus<CR><C-w>T
-    nnoremap <silent> [fugitive]p :Git push origin master<CR>
+    " nnoremap [fugitive] <Nop>
+    " nmap <Leader>g [fugitive]
+    " nnoremap <Leader>gs :Gstatus<CR><C-w>T
+    nnoremap <Leader>gs :Gstatus<CR>
+    " nnoremap <Leader>g [fugitive]p :Git push origin HEAD<CR>
     " GPG著名付きでコミットする
     " ref)
     " git(GitHub)でGPGを使った署名をおこなう - https://qiita.com/pontago/items/5867b6492e09c34084fe
@@ -347,6 +336,22 @@ let g:ref_phpmanual_path = $HOME.'/.vim/vim-ref/php-chunked-xhtml'
 let g:ref_use_cache = 1
 let g:ref_use_vimproc = 1
 " }}}
+
+" ------------------------------------------------------------------------------
+" vim-grepper
+" ------------------------------------------------------------------------------
+if filereadable(expand('~/.vim/plugged/vim-grepper/plugin/grepper.vim'))
+    let g:grepper = {}
+    let g:grepper.tool = ['rg', 'grep']
+
+    " Search for the current word
+    nnoremap <Leader>* :GrepperRg -cword -noprompt<CR>
+" Search for the current selection
+    nmap gs <plug>(GrepperOperator)
+    xmap gs <plug>(GrepperOperator)
+
+    command! Todo :GrepperRg -ni '(TODO|FIXME)'
+endif
 
 " ------------------------------------------------------------------------------
 " PHP lint
