@@ -121,16 +121,30 @@ call plug#begin('~/.vim/plugged')
     Plug 'freeo/vim-kalisi'
     Plug 'junegunn/seoul256.vim'
 
-    " ↓Lazy Loadingしようとして、下のようにするとE580エラーになる
-    " Plug 'scrooloose/nerdtree', {'on', 'NERDTreeToggle'}
-    Plug 'scrooloose/nerdtree'
-    Plug 'Xuyuanp/nerdtree-git-plugin'
-
     " Plug 'itchyny/lightline.vim'
 
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     let g:airline_theme = 'molokai'
+    
+    " -------------------------------------------------
+    " IDE
+    " -------------------------------------------------
+
+    " ↓Lazy Loadingしようとして、下のようにするとE580エラーになる
+    " Plug 'scrooloose/nerdtree', {'on', 'NERDTreeToggle'}
+    Plug 'scrooloose/nerdtree'
+    Plug 'Xuyuanp/nerdtree-git-plugin'
+
+    Plug 'vim-scripts/taglist.vim'
+    let Tlist_Show_One_File = 1
+    let Tlist_Use_Right_Window = 1
+    let Tlist_Exit_OnlyWindow = 1
+
+    Plug 'simeji/winresizer'
+    let g:winresizer_enable = 1
+    let g:winresizer_start_key = '<C-s>'
+    let g:winresizer_gui_start_key = '<C-e>'
 
     " -------------------------------------------------
     " *nite
@@ -147,10 +161,18 @@ call plug#begin('~/.vim/plugged')
     " Plug 'airblade/vim-gitgutter'
 
     Plug 'w0rp/ale'
+    " 左端のシンボルカラムを表示したままにする
+    let g:ale_sign_column_always = 1
+    let g:ale_linters = {
+        \ 'php': ['phpcs', 'php']
+        \}
+    let g:ale_php_phpcs_executable = $HOME.'/.composer/vendor/bin/phpcs'
+    let g:ale_php_phpcs_standard = 'PSR1,PSR2'
+    let g:ale_php_phpcs_use_global = 1
 
     " CtrlP.vim
     Plug 'kien/ctrlp.vim'
-    let g:ctrlp_map = '<c-p>'
+    let g:ctrlp_map = '<C-p>'
     let g:ctrlp_cmd = 'CtrlP'
 
     " -------------------------------------------------
@@ -206,7 +228,24 @@ call plug#begin('~/.vim/plugged')
 
     " URLをハイライト表示する
     Plug 'itchyny/vim-highlighturl'
+
+    Plug 'vim-scripts/dbext.vim'
+    let g:dbext_default_profile=""
+    let g:dbext_default_type="PGSQL"
+    let g:dbext_default_user="hip_app"
+    let g:dbext_default_passwd="secret"
+    let g:dbext_default_dbname="hip"
+    let g:dbext_default_host="localhost"
+    let g:dbext_default_port="54320"
+
 call plug#end()
+
+map <silent> <leader>T :WinResizerStartResize<CR>
+
+" ------------------------------------------------------------------------------
+" taglist.vim
+" ------------------------------------------------------------------------------
+map <silent> <leader>t :TlistToggle<CR>
 
 " ------------------------------------------------------------------------------
 " haya14busa/incsearch.vim
