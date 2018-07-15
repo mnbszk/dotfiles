@@ -400,7 +400,7 @@ endif
 " augroup PHP
 "     autocmd!
 "     autocmd FileType php set makeprg=php\ -l\ %
-"     " php -l の構文チェックでエラーがなければ"No syntax errors" の一行だけ出力
+"     " php -l の構文チェックでエラーがなければ"No syntax errrs" の一行だけ出力
 "     " される
 "     autocmd BufWritePost *.php silent make | if len(getqflist()) != 1 | copen | else | cclose | endif
 " augroup END
