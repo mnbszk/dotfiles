@@ -116,6 +116,33 @@ call plug#begin('~/.vim/plugged')
     " 外部マニュアル
     Plug 'thinca/vim-ref'
 
+    " -------------------------------------------------
+    " Git
+    " -------------------------------------------------
+    " vim-fugitiveはvim-airlineより前に書くこと
+    Plug 'tpope/vim-fugitive'
+    "
+    Plug 'mhinz/vim-signify'
+    " Plug 'airblade/vim-gitgutter'
+    " 未修正ファイルでもvim-gitgutter列を表示して差分表示で画面をガタガタさせない
+    " https://budougumi0617.github.io/2018/06/20/setting-vim-gitgutter-column-shows-always/
+    set signcolumn=yes
+
+    Plug 'w0rp/ale'
+    " 左端のシンボルカラムを表示したままにする
+    let g:ale_sign_column_always = 1
+    let g:ale_linters = {
+        \ 'php': ['phpcs', 'php']
+        \}
+    let g:ale_php_phpcs_executable = $HOME.'/.composer/vendor/bin/phpcs'
+    let g:ale_php_phpcs_standard = 'PSR1,PSR2'
+    let g:ale_php_phpcs_use_global = 1
+
+    " CtrlP.vim
+    Plug 'kien/ctrlp.vim'
+    let g:ctrlp_map = '<C-p>'
+    let g:ctrlp_cmd = 'CtrlP'
+
     " ----------------------------------------
     " 見た目系
     " ----------------------------------------
@@ -154,33 +181,6 @@ call plug#begin('~/.vim/plugged')
     " -------------------------------------------------
     " Plug 'Shougo/denite.nvim'
     Plug 'Shougo/unite.vim'
-
-    " -------------------------------------------------
-    " Git
-    " -------------------------------------------------
-    Plug 'tpope/vim-fugitive'
-    "
-    Plug 'mhinz/vim-signify'
-    " Plug 'airblade/vim-gitgutter'
-    " 未修正ファイルでもvim-gitgutter列を表示して差分表示で画面をガタガタさせない
-    " https://budougumi0617.github.io/2018/06/20/setting-vim-gitgutter-column-shows-always/
-    set signcolumn=yes
-
-    Plug 'w0rp/ale'
-    " 左端のシンボルカラムを表示したままにする
-    let g:ale_sign_column_always = 1
-    let g:ale_linters = {
-        \ 'php': ['phpcs', 'php']
-        \}
-    let g:ale_php_phpcs_executable = $HOME.'/.composer/vendor/bin/phpcs'
-    let g:ale_php_phpcs_standard = 'PSR1,PSR2'
-    let g:ale_php_phpcs_use_global = 1
-
-    " CtrlP.vim
-    Plug 'kien/ctrlp.vim'
-    let g:ctrlp_map = '<C-p>'
-    let g:ctrlp_cmd = 'CtrlP'
-
     " -------------------------------------------------
     " ファイルタイプ別
     " -------------------------------------------------
@@ -224,6 +224,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'haya14busa/incsearch-migemo.vim'
 
     Plug 'mhinz/vim-grepper'
+
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+    Plug 'junegunn/fzf.vim'
 
     " -------------------------------------------------
     " その他
@@ -297,7 +300,7 @@ if filereadable(expand('~/.vim/plugged/vim-fugitive/plugin/fugitive.vim'))
     " nnoremap [fugitive] <Nop>
     " nmap <Leader>g [fugitive]
     " nnoremap <Leader>gs :Gstatus<CR><C-w>T
-    nnoremap <Leader>gs :Gstatus<CR>
+    nnoremap <Leader>Gs :Gstatus<CR>
     " nnoremap <Leader>g [fugitive]p :Git push origin HEAD<CR>
     " GPG著名付きでコミットする
     " ref)
@@ -379,17 +382,30 @@ let g:ref_use_vimproc = 1
 " ------------------------------------------------------------------------------
 " vim-grepper
 " ------------------------------------------------------------------------------
-if filereadable(expand('~/.vim/plugged/vim-grepper/plugin/grepper.vim'))
-    let g:grepper = {}
-    let g:grepper.tool = ['rg', 'grep']
+set grepprg=rg\ -H\ --no-heading\ --vimgrep
+set grepformat=$f:$l:%c:%m
 
-    " Search for the current word
-    nnoremap <Leader>* :GrepperRg -cword -noprompt<CR>
-" Search for the current selection
+if filereadable(expand('~/.vim/plugged/vim-grepper/plugin/grepper.vim'))
+    nnoremap <leader>g :Grepper -tool rg<cr>
+    nnoremap <leader>G :Grepper -tool rg -buffers<cr>
+
     nmap gs <plug>(GrepperOperator)
     xmap gs <plug>(GrepperOperator)
 
-    command! Todo :GrepperRg -ni '(TODO|FIXME)'
+    let g:grepper = {}
+    let g:grepper.tool = ['rg', 'grep', 'git']
+    let g:grepper.jump = 1
+    let g:grepper.next_tool = '<leader>g'
+    let g:grepper.simple_prompt = 1
+    " let g:grepper.quickfix = 0
+
+    " Search for the current word
+    nnoremap <Leader>* :GrepperRg -cword -noprompt<CR>
+    " Search for the current selection
+    nmap gs <plug>(GrepperOperator)
+    xmap gs <plug>(GrepperOperator)
+
+    command! Todo :Grepper -tool rg -query '(TODO|FIXME)'
 endif
 
 " ------------------------------------------------------------------------------
