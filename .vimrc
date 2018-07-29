@@ -68,7 +68,50 @@ set mouse=a
 "
 "キーバインドの変更
 "
-let mapleader=","
+" この記事が参考になる
+" Vimの生産性を高める12の方法
+" https://postd.cc/how-to-boost-your-vim-productivity/
+"
+" let mapleader=","
+let mapleader="\<Space>"
+let maplocalleader=","
+
+" ファイルを開く
+nnoremap <Leader>o :CtrlP<CR>
+
+" ファイルを保存する
+nnoremap <Leader>w :w<CR>
+
+" <Leader>pと<Leader>yでシステムのクリップボードにコピー＆ペーストする
+vmap <Leader>y "+y
+vmap <Leader>d "+d
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+" ビジュアルラインモードに切り替える
+nmap <Leader><Leader> V
+
+" 前のバッファに切り替える
+nnoremap <Leader><Tab> <C-^>
+
+
+" 貼り付けたテキストの末尾に自動的に移動する
+vnoremap <silent> y y`]
+vnoremap <silent> p p`]
+nnoremap <silent> p p`]
+
+" Enterでファイルの末尾に移動する
+nnoremap <CR> G
+" Backspaceでファイルの先頭に移動する
+nnoremap <BS> gg
+
+" 貼り付けたテキストを素早く選択する
+noremap gV `[v`]
+
+" カーソル下の1単語とヤンクしてきた文字列を置き換える
+nnoremap ciy ciw<C-r>0<ESC>
 
 " nnoremap    <C-u>   g~iw
 noremap     <C-j>   <ESC>
@@ -184,12 +227,18 @@ call plug#begin('~/.vim/plugged')
     Plug 'Shougo/neomru.vim'
     Plug 'Shougo/neoyank.vim'
     Plug 'thinca/vim-unite-history'
+    " unite.vimまとめ
+    " https://qiita.com/hide/items/77b9c1b0f29577d60397#vimrc
     let g:unite_enable_start_insert=1
     " let g:unite_source_history_yank_enable=1
     let g:unite_source_file_mru_limit=200
+    " yankの履歴
     nnoremap <silent> <leader>uy :<C-u>Unite history/yank<CR>
     nnoremap <silent> <leader>ub :<C-u>Unite buffer<CR>
-    nnoremap <silent> <leader>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    " カレントディレクトリを表示
+    " nnoremap <silent> <leader>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    nnoremap <silent> <leader>uf :<C-u>UniteWithProjectDir -buffer-name=files file<CR>
+    " nnoremap <silent> <leader>uf :<C-u>Unite file<CR>
     nnoremap <silent> <leader>ur :<C-u>Unite -buffer-name=register register<CR>
     nnoremap <silent> <leader>uu :<C-u>Unite file_mru buffer<CR>
 
@@ -434,3 +483,15 @@ endif
 " augroup END
 
 "cd Projects/hip
+
+" vp doesn't replace paste buffer
+function! RestoreRegister()
+    let @" = s:restore_reg
+    return ''
+endfunction
+function! s:Repl()
+    let s:restore_reg = @"
+    return "p@=RestoreRegister()\<cr>"
+endfunction
+vmap <silent> <expr> p <sid>Repl()
+
