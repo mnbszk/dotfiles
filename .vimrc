@@ -181,6 +181,18 @@ call plug#begin('~/.vim/plugged')
     " -------------------------------------------------
     " Plug 'Shougo/denite.nvim'
     Plug 'Shougo/unite.vim'
+    Plug 'Shougo/neomru.vim'
+    Plug 'Shougo/neoyank.vim'
+    Plug 'thinca/vim-unite-history'
+    let g:unite_enable_start_insert=1
+    " let g:unite_source_history_yank_enable=1
+    let g:unite_source_file_mru_limit=200
+    nnoremap <silent> <leader>uy :<C-u>Unite history/yank<CR>
+    nnoremap <silent> <leader>ub :<C-u>Unite buffer<CR>
+    nnoremap <silent> <leader>uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+    nnoremap <silent> <leader>ur :<C-u>Unite -buffer-name=register register<CR>
+    nnoremap <silent> <leader>uu :<C-u>Unite file_mru buffer<CR>
+
     " -------------------------------------------------
     " ファイルタイプ別
     " -------------------------------------------------
