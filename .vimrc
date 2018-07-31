@@ -103,7 +103,7 @@ vnoremap <silent> p p`]
 nnoremap <silent> p p`]
 
 " Enterでファイルの末尾に移動する
-nnoremap <CR> G
+" nnoremap <CR> G
 " Backspaceでファイルの先頭に移動する
 nnoremap <BS> gg
 
@@ -208,6 +208,8 @@ call plug#begin('~/.vim/plugged')
     " Plug 'scrooloose/nerdtree', {'on', 'NERDTreeToggle'}
     Plug 'scrooloose/nerdtree'
     Plug 'Xuyuanp/nerdtree-git-plugin'
+    Plug 'jistr/vim-nerdtree-tabs'
+    let g:nerdtree_tabs_open_on_console_startup=1
 
     Plug 'vim-scripts/taglist.vim'
     let Tlist_Show_One_File = 1
@@ -256,16 +258,35 @@ call plug#begin('~/.vim/plugged')
     " -------------------------------------------------
     " 編集系
     " -------------------------------------------------
-    " インデントを可視化する
-    Plug 'nathanaelkane/vim-indent-guides'
-    " 起動時に可視化を有効にする
-    let g:indent_guides_enable_on_vim_startup = 1
-    " 可視化領域のサイズ
-    let g:indent_guides_guide_size = 1
-    " 可視化を開始する階層
-    let g:indent_guides_start_level = 2
-    " 無効にするファイルタイプ
-    let g:indent_guides_exclude_filetypes = ['help', 'nerdtree', 'ref-phpmanual']
+    "  UltiSnip
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+
+    " Trigger configuration.
+    " Do not use <tab> if you use YouCompleteMe.
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsForwardTrigger="<C-b>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-z>"
+    " If you want :UltiSnipsEdit to split your window.
+    let g:UltiSnipsEditSplit="vertical"
+
+    " " インデントを可視化する
+    " Plug 'nathanaelkane/vim-indent-guides'
+    " " 起動時に可視化を有効にする
+    " let g:indent_guides_enable_on_vim_startup = 1
+    " " 可視化領域のサイズ
+    " let g:indent_guides_guide_size = 1
+    " " 可視化を開始する階層
+    " let g:indent_guides_start_level = 2
+    " " 無効にするファイルタイプ
+    " let g:indent_guides_exclude_filetypes = ['help', 'nerdtree', 'ref-phpmanual']
+
+    " vimをconcealオプションを有効にしてコンパイルしないと使えない
+    Plug 'Yggdroot/indentLine'
+    let g:indentLine_faster = 1
+    nmap <silent><Leader>i :<C-u>IndentLinesToggle<CR>
+    " let g:indentLine_setColors = 0
+    " let g:indentLine_color_term = 239
 
     " 括弧で囲む
     Plug 'tpope/vim-surround'
