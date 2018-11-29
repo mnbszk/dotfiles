@@ -1,25 +1,26 @@
+" .vimrc
+" Manabu Suezaki (manabu.szk@gmail.com)
+"
+
 " Don't try to be vi compatible
 set nocompatible
 filetype off
 
-" スワップファイルを作成しない
-set noswapfile
-" バックアップファイルを作成しない 
-set nobackup 
-" 
-
 " Turn on syntax highlighting
 syntax on
+
+" スワップファイルを作成しない
+set noswapfile
+" バックアップファイルを作成しない
+set nobackup 
+
+" ファイルがVim外部で変更されたときに自動的に読み直す
+set autoread
 
 set background=dark
 "colorscheme Tomorrow-Night
 
-" 文字コードを指定(UTF-8)
-set fenc=utf-8
-
-set autoread
-
-"ステータスラインにコマンドを表示
+"ステータスラインに入力中のコマンドを表示
 set showcmd
 
 "ルーラーを表示する
@@ -28,46 +29,91 @@ set ruler
 set number
 set numberwidth=4
 
-set cursorline
-set cursorcolumn
-
-
-set showmatch
-
-"タブ・インデントの設定
-set expandtab
-set tabstop=4
-set shiftwidth=4
-
-set autoindent
-"新しい行を作った時に高度な自動インデントを行う
-set smartindent
+" カーソル移動が遅くなる場合はオフにすると早くなる
+" https://eduncan911.com/software/fix-slow-scrolling-in-vim-and-neovim.html
+"set cursorline
+"set cursorcolumn
 
 "ビープ音を消す
 set vb t_vb=
 
 " Show “invisible” characters
-set listchars=tab:»-,trail:-,eol:¬,extends:»,precedes:«,nbsp:%
 set list
+set listchars=tab:»-,trail:-,eol:¬,extends:»,precedes:«,nbsp:%
 " Help, NERDTreeバッファでは不可視文字を表示しない
 autocmd FileType help setlocal nolist
 autocmd FileType nerdtree setlocal nolist
 autocmd FileType phpmanual setlocal nolist
-
-" 検索キーワードをハイライト表示する
-set hlsearch
 
 "ステータスラインを常に表示
 " Status bar
 set laststatus=2
 " set statusline=%<[%n]%m%r%h%w%f%m\ %{fugitive#statusline()}%=%l,%c\ %{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}%y
 
-" Enable use of the mouse for all modes
-set mouse=a
+"-------------------------------------------------------------------------------
+" 文字コード
+"-------------------------------------------------------------------------------
+" 文字コードを指定(UTF-8)（保存時の文字コード）
+set fenc=utf-8
+" ファイル読み込み時の文字コード指定
+set encoding=utf-8
+" Vim Script内でマルチバイト文字を使うための設定
+scriptencoding utf-8
+" □や○文字が崩れる問題を解決
+" iTerm2を使う場合は、Profiles->Text->Treat ambiguous-width characters as
+" double widthをオンにする
+set ambiwidth=double
 
-"
-"キーバインドの変更
-"
+"-------------------------------------------------------------------------------
+" タブ・インデントの設定
+"-------------------------------------------------------------------------------
+" タブをスペースに変換する
+set expandtab
+" タブ文字の幅
+set tabstop=4
+" 改行時に前の行のインデントを継続する
+set autoindent
+"新しい行を作った時に高度な自動インデントを行う
+set smartindent
+" smartindentで増減するインデントのスペース幅
+set shiftwidth=4
+
+"-------------------------------------------------------------------------------
+" 文字列検索
+"-------------------------------------------------------------------------------
+" インクリメンタルサーチ
+set incsearch
+" 検索パターンに大文字小文字を区別しない
+set ignorecase
+" 検索パターンに大文字を含んでいたら大文字小文字を区別する
+set smartcase
+" 検索キーワードをハイライト表示する
+set hlsearch
+
+"-------------------------------------------------------------------------------
+" カッコ・タグジャンプ
+"-------------------------------------------------------------------------------
+" カッコの対応関係を一瞬表示する
+set showmatch
+" Vimの「%」を拡張する
+source $VIMRUNTIME/macros/matchit.vim
+
+"-------------------------------------------------------------------------------
+" マウス
+"-------------------------------------------------------------------------------
+" Enable use of the mouse for all modes
+if has('mouse')
+    set mouse=a
+endif
+
+"-------------------------------------------------------------------------------
+" クリップボード
+"-------------------------------------------------------------------------------
+"set clipboard=unnamed,autoselect
+
+"-------------------------------------------------------------------------------
+" キーバインド
+"-------------------------------------------------------------------------------
 " この記事が参考になる
 " Vimの生産性を高める12の方法
 " https://postd.cc/how-to-boost-your-vim-productivity/
@@ -134,6 +180,10 @@ nnoremap    <leader>sv  :source $MYVIMRC<CR>
 " :set noimdisable としておくこと
 " inoremap <ESC> <ESC>:set iminsert=0<CR>
 
+"-------------------------------------------------------------------------------
+" プラグイン
+"-------------------------------------------------------------------------------
+
 " 2018-05-28 vin-plug導入
 if has('vim_starting')
     set rtp+=~/.vim/plugged/vim-plug
@@ -171,7 +221,14 @@ call plug#begin('~/.vim/plugged')
     " https://budougumi0617.github.io/2018/06/20/setting-vim-gitgutter-column-shows-always/
     set signcolumn=yes
 
+    " -------------------------------------------------
+    " Lint Tool
+    " -------------------------------------------------
+
+    " ALE (Asynchronous Lint Engine)
+    " 非同期コードチェック
     Plug 'w0rp/ale'
+
     " 左端のシンボルカラムを表示したままにする
     let g:ale_sign_column_always = 1
     let g:ale_linters = {
@@ -181,15 +238,29 @@ call plug#begin('~/.vim/plugged')
     let g:ale_php_phpcs_standard = 'PSR1,PSR2'
     let g:ale_php_phpcs_use_global = 1
 
-    " CtrlP.vim
+    " -------------------------------------------------
+    " Project
+    " -------------------------------------------------
+
+    " CtrlP.vim - 多機能セレクタ
     Plug 'kien/ctrlp.vim'
     let g:ctrlp_map = '<C-p>'
     let g:ctrlp_cmd = 'CtrlP'
+    let g:ctrlp_show_hidden=1
+    " 拡張プラグイン・関数検索
+    Plug 'tacahiroy/ctrlp-funky'
+    " 拡張プラグイン・コマンド履歴検索
+    Plug 'suy/vim-ctrlp-commandline'
+    let g:ctrlp_extensions = ['funky', 'commandline']
+    command! CtrlPCommandLine call ctrlp#init(ctrlp#commandline#id())
+    let g:ctrlp_funky_matchtype='path'
 
     " ----------------------------------------
     " 見た目系
     " ----------------------------------------
+    "  colorscheme
     Plug 'tomasr/molokai'
+    Plug 'mhartington/oceanic-next'
 
     Plug 'freeo/vim-kalisi'
     Plug 'junegunn/seoul256.vim'
@@ -198,8 +269,10 @@ call plug#begin('~/.vim/plugged')
 
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
+    let g:airline_powerline_fonts = 1
+    " https://github.com/vim-airline/vim-airline/wiki/Screenshots
     let g:airline_theme = 'molokai'
-    
+
     " -------------------------------------------------
     " IDE
     " -------------------------------------------------
@@ -210,6 +283,12 @@ call plug#begin('~/.vim/plugged')
     Plug 'Xuyuanp/nerdtree-git-plugin'
     Plug 'jistr/vim-nerdtree-tabs'
     let g:nerdtree_tabs_open_on_console_startup=1
+
+    "  devicons
+    Plug 'ryanoasis/vim-devicons'
+    " https://github.com/ryanoasis/vim-devicons/wiki/Extra-Configuration
+    let g:webdevicons_conceal_nerdtree_brackets = 1
+    let g:WebDevIconsNerdTreeAfterGlyphPadding = '  '
 
     Plug 'vim-scripts/taglist.vim'
     let Tlist_Show_One_File = 1
@@ -247,6 +326,10 @@ call plug#begin('~/.vim/plugged')
     " -------------------------------------------------
     " ファイルタイプ別
     " -------------------------------------------------
+    Plug 'elixir-editors/vim-elixir'
+
+    Plug 'posva/vim-vue'
+
     Plug 'mattn/emmet-vim'
 
     Plug 'jwalton512/vim-blade', {'for': 'blade'}
@@ -352,13 +435,14 @@ map m? <Plug>(incsearch-migemo-?)
 map mg/ <Plug>(incsearch-migemo-stay)
 
 " ------------------------------------------------------------------------------
-" colorscheme molokai
+" colorscheme
 " ------------------------------------------------------------------------------
-if filereadable(expand('~/.vim/plugged/molokai/colors/molokai.vim'))
-    let g:molokai_original = 1
-    let g:rehash256 = 1
-endif
-colorscheme molokai
+colorscheme OceanicNext
+" if filereadable(expand('~/.vim/plugged/molokai/colors/molokai.vim'))
+"     let g:molokai_original = 1
+"     let g:rehash256 = 1
+" endif
+" colorscheme molokai
 
 " ------------------------------------------------------------------------------
 " tcomment_vim
