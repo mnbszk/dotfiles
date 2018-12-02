@@ -277,6 +277,20 @@ call plug#begin('~/.vim/plugged')
     " IDE
     " -------------------------------------------------
 
+    " Completion plugin
+    " https://github.com/Shougo/deoplete.nvim
+    if has('nvim')
+        Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    else
+        Plug 'Shougo/deoplete.nvim'
+        Plug 'roxma/nvim-yarp'
+        Plug 'roxma/vim-hug-neovim-rpc'
+    endif
+    let g:deoplete#enable_at_startup=1
+    " Plug 'Shougo/neocomplcache'
+    " let g:neocomplcache_enable_at_startup=1
+    " let g:neocomplcache_enable_smart_case=1
+
     " ↓Lazy Loadingしようとして、下のようにするとE580エラーになる
     " Plug 'scrooloose/nerdtree', {'on', 'NERDTreeToggle'}
     Plug 'scrooloose/nerdtree'
